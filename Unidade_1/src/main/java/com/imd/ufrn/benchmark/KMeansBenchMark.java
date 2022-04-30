@@ -5,7 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.imd.ufrn.model.IrisSample;
-import com.imd.ufrn.model.KMeans;
+import com.imd.ufrn.model.logic.ConcurrentKMeans;
+import com.imd.ufrn.model.logic.SerialKMeans;
 import com.imd.ufrn.utils.CsvReader;
 
 import org.openjdk.jmh.annotations.Benchmark;
@@ -30,14 +31,14 @@ public class KMeansBenchMark {
 
 	@Benchmark
 	public void serialKMeans() {
-        KMeans kmeans = new KMeans(3, testData);
-		kmeans.runSerial();
+        SerialKMeans kmeans = new SerialKMeans(3, testData);
+		kmeans.fit();
 	}
 
 	@Benchmark
 	public void parallelKMeans() {
-		KMeans kmeans = new KMeans(3, testData);
-		kmeans.runParallel(Runtime.getRuntime().availableProcessors());
+		ConcurrentKMeans kmeans = new ConcurrentKMeans(3, testData);
+		kmeans.fit();
 	}
 
 }
