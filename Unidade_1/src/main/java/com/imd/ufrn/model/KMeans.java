@@ -6,13 +6,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class KMeans {
-    private int k;
-    private int dimensions;
-    private List<IrisSample> dataset;
-    private List<IrisSample> centroids;
-    
-    public KMeans(int k, List<IrisSample> dataset) {
+public abstract class KMeans {
+    protected int k;
+    protected int dimensions;
+    protected List<IrisSample> dataset;
+    protected List<IrisSample> centroids;
+
+    protected KMeans(int k, List<IrisSample> dataset) {
         this.k = k;
         this.dataset = dataset;
         this.dimensions = dataset.get(0).getVetorialForm().length;
@@ -30,7 +30,9 @@ public class KMeans {
 		return Math.sqrt(sum);
 	}
 
-    private int kMeansCalculation(){
+    public abstract int fit();
+
+    protected int kMeansCalculation(){
         int runs = 0;
         boolean convergence = false;
         initCentroids();
@@ -64,50 +66,6 @@ public class KMeans {
             ++runs;
         }
         return runs;
-    }
-
-    public void runSerial(){
-        kMeansCalculation();
-    }
-
-    public void runParallel(int nThreads) {
-        KMeansThread[] threads = new KMeansThread[nThreads];
-        int threadLoad = this.dataset.size()/nThreads;
-        boolean firstCentroid = true;
-
-        for(int i = 0; i < nThreads; i++){
-            int rangeMin = i*threadLoad;
-            int rangeMax = (i+1)*threadLoad;
-		    threads[i] = new KMeansThread(rangeMin, rangeMax);
-		    threads[i].start();
-		}
-
-        for (KMeansThread thread : threads) {
-            try {
-                thread.join();
-                firstCentroid = setConcurrentCentroid(thread.getCentroid(),firstCentroid);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                Thread.currentThread().interrupt();
-            }
-        }
-    }
-
-    public synchronized boolean setConcurrentCentroid(List<IrisSample> threadCentroid, boolean first){
-        if(first) {
-            this.centroids = threadCentroid;
-        }
-        else{
-            for (int i = 0; i < this.k; i++) {
-                double[] mc = this.centroids.get(i).getVetorialForm();
-                double[] tc = threadCentroid.get(i).getVetorialForm();
-                for (int dim = 0; dim < mc.length; dim++) {
-                    mc[dim]=(mc[dim]+tc[dim])/2;
-                }
-                this.centroids.set(i, new IrisSample(mc));
-            }
-        }
-        return false;
     }
 
     public String printCentroids(){
@@ -155,28 +113,4 @@ public class KMeans {
             this.centroids.set(kc, new IrisSample(clusterSums[kc]));
         }
     }
-    
-    private class KMeansThread extends Thread {
-
-        private int rangeMin;
-        private int rangeMax;
-        private List<IrisSample> centroid;
-
-        public KMeansThread(int rangeMin, int rangeMax) {
-            this.rangeMin = rangeMin;
-            this.rangeMax = rangeMax;
-        }
-
-        public List<IrisSample> getCentroid() {
-            return centroid;
-        }
-
-        @Override
-		public void run() {
-			KMeans kMeans = new KMeans(k, new ArrayList<>(dataset.subList(rangeMin, rangeMax)));
-            kMeans.kMeansCalculation();
-            this.centroid = kMeans.getCentroids();
-		}
-	}
-
 }

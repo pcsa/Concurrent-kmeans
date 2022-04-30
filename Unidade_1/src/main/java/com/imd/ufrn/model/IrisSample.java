@@ -21,7 +21,6 @@ public class IrisSample {
     }
 
     public double[] getVetorialForm(){
-        double[] tmp = {this.sepalLength, this.sepalWidth, this.petalLength, this.petalWidth};
-        return tmp;
+        return new double[] {this.sepalLength, this.sepalWidth, this.petalLength, this.petalWidth};
     }
 }
