@@ -68,7 +68,6 @@ public class KMeans {
 
     public void runSerial(){
         kMeansCalculation();
-        // printCentroids();
     }
 
     public void runParallel(int nThreads) {
@@ -92,7 +91,6 @@ public class KMeans {
                 Thread.currentThread().interrupt();
             }
         }
-        // printCentroids();
     }
 
     public synchronized boolean setConcurrentCentroid(List<IrisSample> threadCentroid, boolean first){
@@ -112,16 +110,20 @@ public class KMeans {
         return false;
     }
 
-    public void printCentroids(){
+    public String printCentroids(){
+        StringBuilder sb = new StringBuilder();
         DecimalFormat df = (DecimalFormat) NumberFormat.getNumberInstance(Locale.US);
         df.applyPattern("0.00");
-        for (IrisSample sample : centroids) {
-            double[] tmp = sample.getVetorialForm();
+
+        for (int c=0; c < centroids.size(); c++) {
+            double[] tmp = centroids.get(c).getVetorialForm();
+            sb.append("c"+c+" - ");
             for (int i = 0; i < tmp.length; i++) {
-                System.out.print(df.format(tmp[i])+" ");
+                sb.append(df.format(tmp[i])+" ");
             }
-            System.out.println();
+            sb.append("\n");
         }
+        return sb.toString();
     }
 
     private boolean checkConvergence(List<IrisSample> prev) {
@@ -139,9 +141,8 @@ public class KMeans {
 
     private void initCentroids() {
         centroids = new ArrayList<>();
-        int steps = dataset.size()/this.dimensions;
         for (int i = 0; i < this.k; i++) {
-            centroids.add(dataset.get(i*steps));
+            centroids.add(dataset.get(i));
         }
     }
 
