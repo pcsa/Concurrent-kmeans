@@ -22,15 +22,17 @@ public class App {
             start = System.currentTimeMillis();    
             
             kmeans.runSerial();
+            kmeans.printCentroids();
 
             elapsedTime = System.currentTimeMillis() - start;
             System.out.println("\nFinalizado em serial. "+elapsedTime/1000F+"s\n");
 
-            Thread.sleep(5000);
+            Thread.sleep(1000);
 
             start = System.currentTimeMillis();
             
             kmeans.runParallel(Runtime.getRuntime().availableProcessors());
+            kmeans.printCentroids();
             
             elapsedTime = System.currentTimeMillis() - start;
             System.out.println("\nFinalizado em paralelo. "+elapsedTime/1000F+"s\n");

@@ -12,36 +12,14 @@ public class KMeans {
     private List<IrisSample> dataset;
     private List<IrisSample> centroids;
     
-
     public KMeans(int k, List<IrisSample> dataset) {
         this.k = k;
         this.dataset = dataset;
         this.dimensions = dataset.get(0).getVetorialForm().length;
     }
 
-
-    public void setDataset(List<IrisSample> dataset){
-        this.dataset = dataset;
-    }
-
-    public List<IrisSample> getDataset() {
-        return this.dataset;
-    }
-
     public List<IrisSample> getCentroids() {
         return this.centroids;
-    }
-
-    public void setCentroids(List<IrisSample> centroids) {
-        this.centroids = centroids;
-    }
-
-    public int getK() {
-        return this.k;
-    }
-
-    public void setK(int k) {
-        this.k = k;
     }
 
     private double getDistance(double[] v1, double[] v2) {
@@ -90,7 +68,7 @@ public class KMeans {
 
     public void runSerial(){
         kMeansCalculation();
-        printCentroids();
+        // printCentroids();
     }
 
     public void runParallel(int nThreads) {
@@ -114,7 +92,7 @@ public class KMeans {
                 Thread.currentThread().interrupt();
             }
         }
-        printCentroids();
+        // printCentroids();
     }
 
     public synchronized boolean setConcurrentCentroid(List<IrisSample> threadCentroid, boolean first){

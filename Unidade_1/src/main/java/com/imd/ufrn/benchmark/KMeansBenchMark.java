@@ -9,8 +9,11 @@ import com.imd.ufrn.model.KMeans;
 import com.imd.ufrn.utils.CsvReader;
 
 import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
+import org.openjdk.jmh.annotations.State;
 
+@State(Scope.Benchmark)
 public class KMeansBenchMark {
     private static final String FILE_PATH_NAME = "test.csv";
     private static final List<IrisSample> testData = new ArrayList<>();
