@@ -10,29 +10,57 @@ import org.openjdk.jmh.profile.GCProfiler;
 import org.openjdk.jmh.profile.StackProfiler;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
-import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.ChainedOptionsBuilder;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 public class BenchMarkRunner {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
 		
 		final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
-		String reportName = "report-"+sdf.format(new Timestamp(System.currentTimeMillis()))+".log.md";
+		final String runBatch = sdf.format(new Timestamp(System.currentTimeMillis()));
+		final String fileType = ".log.md";
+		final String defaultReportName = "report_";
+		final String alternativeGC = "ZGC";
 
-		Options opt = new OptionsBuilder()
+		String reportName = defaultReportName+runBatch+fileType;
+		String reportNameZGC = defaultReportName+alternativeGC+"_"+runBatch+fileType;
+
+		ChainedOptionsBuilder opt = new OptionsBuilder()
 				.include(KMeansBenchMark.class.getSimpleName())
-                .include(ReaderBenchMark.class.getSimpleName())
 				.warmupIterations(5)
 				.shouldDoGC(true)
 				.measurementIterations(5).forks(1)
 				.addProfiler(GCProfiler.class)
 				.addProfiler(StackProfiler.class)
-				.jvmArgs("-server", "-Xms2048m","-Xmx8g")
-				.output(reportName)
-                .build();
+				.output(reportName);
 		try {
-			new Runner(opt).run();
+			new Runner(opt.build()).run();
+			new Runner(opt
+				.jvmArgsAppend("-XX:+UnlockExperimentalVMOptions","-XX:+Use"+alternativeGC)
+				.output(reportNameZGC).build()).run();
+		} catch (RunnerException e) {
+			e.printStackTrace();
+		}
+
+		final String defaultFileReportName = "fileReadingReport"; 
+
+		String fileReaderReportName = defaultFileReportName+runBatch+fileType;
+		String fileReaderReportNameZGC = defaultFileReportName+alternativeGC+"_"+runBatch+fileType;
+		ChainedOptionsBuilder opt2 = new OptionsBuilder()
+				.include(ReaderBenchMark.class.getSimpleName())
+				.warmupIterations(5)
+				.shouldDoGC(true)
+				.measurementIterations(5).forks(1)
+				.addProfiler(GCProfiler.class)
+				.addProfiler(StackProfiler.class)
+				.jvmArgs("-Xms2048m","-Xmx8g")
+				.output(fileReaderReportName);
+		try {
+			new Runner(opt2.build()).run();
+			new Runner(opt2
+					.jvmArgsAppend("-XX:+UnlockExperimentalVMOptions","-XX:+Use"+alternativeGC)
+					.output(fileReaderReportNameZGC).build()).run();
 		} catch (RunnerException e) {
 			e.printStackTrace();
 		}

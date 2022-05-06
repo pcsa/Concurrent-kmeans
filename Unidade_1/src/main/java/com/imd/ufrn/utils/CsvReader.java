@@ -23,8 +23,7 @@ public class CsvReader {
 		}
 	}
 
-	public List<IrisSample> parallelRead(int nThreads, int lines, String path) throws IOException {
-		int chunks = (lines/nThreads);
+	public List<IrisSample> parallelRead(int nThreads, String path) throws IOException {
 		List<IrisSample> data = new ArrayList<>();
 		String dataString = "";
 		
@@ -37,12 +36,10 @@ public class CsvReader {
 		
 		ThreadFileRead[] threads = new ThreadFileRead[nThreads];
 		int lineSize = dataString.indexOf("\n")+1;
-		int last = 0;
-
+		int nLines = (int) dataString.lines().count();
+		int chunks = (nLines/nThreads)*lineSize;
 		for (int i = 0; i < nThreads; i++) {
-			int first = last;
-			last = first + chunks*lineSize;
-			threads[i] = new ThreadFileRead(dataString.subSequence(first, last).toString());
+			threads[i] = new ThreadFileRead(dataString.subSequence(i*chunks, (i+1)*chunks).toString());
 			threads[i].start();
 		}
 

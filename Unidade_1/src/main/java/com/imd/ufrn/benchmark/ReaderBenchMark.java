@@ -26,7 +26,7 @@ public class ReaderBenchMark {
 	@Benchmark
 	public void parallelReader() {
 		try {
-            csvReader.parallelRead(Runtime.getRuntime().availableProcessors(), 56000000, FILE_PATH_NAME);
+            csvReader.parallelRead(Runtime.getRuntime().availableProcessors(), FILE_PATH_NAME);
         } catch (IOException e) {
             e.printStackTrace();
         }
