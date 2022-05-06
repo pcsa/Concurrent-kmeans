@@ -7,6 +7,8 @@ import com.imd.ufrn.model.IrisSample;
 import com.imd.ufrn.model.KMeans;
 
 public class ConcurrentKMeans extends KMeans{
+    
+    volatile int runs;
 
     public ConcurrentKMeans(int k, List<IrisSample> dataset) {
         super(k, dataset);
@@ -19,7 +21,7 @@ public class ConcurrentKMeans extends KMeans{
     public int runParallel(int nThreads) {
         KMeansThread[] threads = new KMeansThread[nThreads];
         int threadLoad = this.dataset.size()/nThreads;
-        int runs = 0;
+        runs = 0;
         boolean firstCentroid = true;
 
         for(int i = 0; i < nThreads; i++){
